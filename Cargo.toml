@@ -1,3 +1,13 @@
-[workspace]
-resolver = "3"
-members = ["rosu-v2", "downloader"]
+[package]
+name = "osu-downloader"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+trpl = "0.3.0"
+threadpool = "1.8.1"
+rosu-v2 = "0.11.0"
+tokio = "1.49.0"
+indicatif = "0.18.3"
+reqwest = "0.13.1"
+futures-util = "0.3.31"
