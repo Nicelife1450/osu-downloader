@@ -25,7 +25,8 @@ const DOWNLOAD_DIR: &str = "./songs";
 pub async fn download_maps(map_id_lst: Vec<u32>) -> Result<(), Box<dyn Error + Send>> {
     fs::create_dir_all(DOWNLOAD_DIR).await
         .map_err(|e| Box::new(e) as Box<dyn Error + Send>)?;
-    
+
+    let map_id_lst = remove_duplicates(map_id_lst);
     let concurrent_limit = 3;
     let multi = Arc::new(MultiProgress::new());
     let semaphore = Arc::new(Semaphore::new(concurrent_limit));
@@ -79,23 +80,39 @@ pub async fn download_maps(map_id_lst: Vec<u32>) -> Result<(), Box<dyn Error + S
     Ok(())
 }
 
-fn remove_duplicates(map_id_lst: &mut Vec<u32>) {
+fn remove_duplicates(map_id_lst: Vec<u32>) -> Vec<u32>{
     if let Some(mut song_dir) = find_game_dir() {
         println!("Found songs directory of Osu. Removing duplicate maps...");
-        song_dir.push("songs");
+        song_dir.push("Songs");
         assert!(song_dir.is_dir());
-        std::fs::read_dir(song_dir)
+        let exist_map_ids: Vec<u32> = std::fs::read_dir(song_dir)
             .unwrap()
-            .map(|entry| {
+            .filter_map(|entry| {
                 let entry = entry.unwrap();
-                let exist_map_id = entry.file_name()
+                let exist_map_id: Result<u32, _> = entry.file_name()
                     .into_string()
                     .unwrap()
                     .split(' ')
                     .next()
-                    .unwrap();
+                    .unwrap()
+                    .parse();
+                match exist_map_id {
+                    Ok(id) => Some(id),
+                    Err(_) => None
+                }
             })
-            
+            .collect();
+        let final_id_lst: Vec<u32> = map_id_lst.iter()
+            .filter(|&id| !exist_map_ids.contains(id))
+            .map(|id| *id)
+            .collect();
+
+        let remove_count = map_id_lst.len() - final_id_lst.len();
+        println!("Removed {} duplicate maps.", remove_count.to_string());
+
+        final_id_lst
+    } else {
+        map_id_lst
     }
 }
 

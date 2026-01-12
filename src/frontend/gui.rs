@@ -231,7 +231,7 @@ impl App {
 pub fn run() -> iced::Result {
     App::run(Settings {
         window: iced::window::Settings {
-            size: iced::Size::new(600.0, 700.0),
+            size: iced::Size::new(480.0, 640.0),
             ..Default::default()
         },
         ..Default::default()
