@@ -1,4 +1,3 @@
-use std::io;
 use rosu_v2::{Osu, error::OsuError, prelude::GameMode};
 
 pub struct SearchConfig {
@@ -68,44 +67,4 @@ pub async fn search_maps(osu: &Osu, config: SearchConfig) -> Vec<u32>{
     }
 
     all_mapset_ids
-}
-
-pub fn get_game_mode() -> GameMode {
-    // Get Game mode
-    let game_mode;
-    loop {
-        println!("Choose mode:\n1. Mania");
-        println!("Enter mode number:");
-        let mut input_mode = String::new();
-        io::stdin()
-            .read_line(&mut input_mode)
-            .unwrap();
-        if let Ok(m) = input_mode.trim().parse::<u8>() {
-            match m {
-                1 => {
-                    game_mode = GameMode::Mania;
-                    break;
-                },
-                _ => {
-                    println!("Unsupported game mode! Please try again.");
-                }
-            }
-        } else {
-            println!("Please enter a number!");
-        }
-    }
-
-    game_mode
-}
-
-pub fn get_mapper() -> String {
-    // Get Mapper
-    println!("Enter mapper name:");
-    let mut mapper = String::new();
-    io::stdin()
-        .read_line(&mut mapper)
-        .unwrap();
-    mapper = mapper.trim().to_string();
-    
-    mapper
 }

@@ -1,4 +1,79 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+use std::env;
+
+/// 搜索本机上的 osu 可执行程序，返回所在的目录
+///
+/// 优先使用环境变量 `OSU_PATH`，否则按常见安装目录进行枚举。
+/// 未找到时返回 `None`。
+pub fn find_game_dir() -> Option<PathBuf> {
+    let exe_names = ["osu!.exe", "osu.exe"];
+
+    // 如果用户显式配置了路径，先尝试该路径
+    if let Ok(custom) = env::var("OSU_PATH") {
+        let candidate = PathBuf::from(custom);
+        // 如果直接给到 exe，返回其父目录
+        if candidate.is_file() {
+            if let Some(parent) = candidate.parent() {
+                return Some(parent.to_path_buf());
+            }
+        }
+        // 如果给到目录，检查是否包含可执行文件
+        if candidate.is_dir() {
+            for exe in exe_names {
+                if candidate.join(exe).is_file() {
+                    return Some(candidate);
+                }
+            }
+        }
+    }
+
+    // 收集可能的安装目录
+    let mut search_roots: Vec<PathBuf> = Vec::new();
+
+    if let Ok(current) = env::current_dir() {
+        search_roots.push(current);
+    }
+
+    if let Ok(home) = env::var("HOME") {
+        let home = PathBuf::from(home);
+        // Wine / osu!lazer 等常见位置
+        search_roots.push(home.join(".local/share/osu"));
+        search_roots.push(home.join(".local/share/osu-wine"));
+        search_roots.push(home.join("AppData/Local/osu!")); // Windows 子目录（在 Wine 下亦常见）
+    }
+
+    for key in ["LOCALAPPDATA", "PROGRAMFILES", "PROGRAMFILES(X86)"] {
+        if let Ok(dir) = env::var(key) {
+            search_roots.push(PathBuf::from(dir).join("osu!"));
+        }
+    }
+
+    for drive in ['C', 'D', 'E', 'F'] {
+        search_roots.push(PathBuf::from(format!("{drive}:\\osu!")));
+        search_roots.push(PathBuf::from(format!("{drive}:\\Games\\osu!")));
+    }
+
+    for root in search_roots {
+        for exe in exe_names {
+            let candidate = if root.is_file() {
+                // root 已是文件
+                root.clone()
+            } else {
+                root.join(exe)
+            };
+
+            if candidate.is_file() {
+                // 返回包含 exe 的目录
+                if let Some(parent) = candidate.parent() {
+                    return Some(parent.to_path_buf());
+                }
+            }
+        }
+    }
+
+    None
+}
 
 // 从响应头或URL中提取文件名
 pub fn extract_filename(res: &reqwest::Response, url: &str, map_id: u32) -> String {
@@ -136,4 +211,20 @@ fn percent_decode(input: &str) -> String {
     
     // 将字节序列转换为 UTF-8 字符串
     String::from_utf8_lossy(&bytes).to_string()
+}
+
+
+#[cfg(test)]
+mod test {
+    use crate::backend::download::utils::*;
+
+    #[test]
+    pub fn test_find_game_dir() {
+        let game_dir = find_game_dir();
+        if let Some(dir) = game_dir {
+            println!("Find osu.exe in {}", dir.to_str().unwrap());
+        } else {
+            println!("Can't find osu.exe.");
+        }
+    }
 }

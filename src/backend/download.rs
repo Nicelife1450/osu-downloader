@@ -6,6 +6,8 @@ use tokio::{fs, io::AsyncWriteExt};
 use utils::extract_filename;
 use tokio::sync::Semaphore;
 
+use crate::backend::download::utils::find_game_dir;
+
 mod utils;
 
 // const SOURCE: &str = "https://catboy.best/d/{id}";
@@ -75,6 +77,26 @@ pub async fn download_maps(map_id_lst: Vec<u32>) -> Result<(), Box<dyn Error + S
     }
     
     Ok(())
+}
+
+fn remove_duplicates(map_id_lst: &mut Vec<u32>) {
+    if let Some(mut song_dir) = find_game_dir() {
+        println!("Found songs directory of Osu. Removing duplicate maps...");
+        song_dir.push("songs");
+        assert!(song_dir.is_dir());
+        std::fs::read_dir(song_dir)
+            .unwrap()
+            .map(|entry| {
+                let entry = entry.unwrap();
+                let exist_map_id = entry.file_name()
+                    .into_string()
+                    .unwrap()
+                    .split(' ')
+                    .next()
+                    .unwrap();
+            })
+            
+    }
 }
 
 async fn download_one(map_id: u32, multi: Arc<MultiProgress>) -> Result<(), Box<dyn Error + Send>> {
