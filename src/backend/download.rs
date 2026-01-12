@@ -135,6 +135,9 @@ async fn download_one(map_id: u32, multi: Arc<MultiProgress>) -> Result<(), Box<
         .content_length()
         .ok_or_else(|| format!("Failed to get content length from '{}'", url))
         .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, e)) as Box<dyn Error + Send>)?;
+    if total_size == 0 {
+        return Err(Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, "Map has content_length of 0.")) as Box<dyn Error + Send>);
+    }
 
     // --- 指示器设置 ---
     let pb = multi.add(ProgressBar::new(total_size));
