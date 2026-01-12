@@ -209,8 +209,6 @@ async fn download_task(mapper: String, game_mode: GameMode) -> Result<(), String
         return Err(format!("No beatmaps found for mapper '{}'", mapper));
     }
 
-    let mapset_ids: Vec<u32> = mapset_ids.iter().take(10).copied().collect();
-
     download_maps(mapset_ids)
         .await
         .map_err(|e| format!("Download failed: {}", e))?;

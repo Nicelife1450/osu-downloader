@@ -82,8 +82,8 @@ pub async fn download_maps(map_id_lst: Vec<u32>) -> Result<(), Box<dyn Error + S
 
 fn remove_duplicates(map_id_lst: Vec<u32>) -> Vec<u32>{
     if let Some(mut song_dir) = find_game_dir() {
-        println!("Found songs directory of Osu. Removing duplicate maps...");
         song_dir.push("Songs");
+        println!("Found songs directory of Osu in {}. Removing duplicate maps...", song_dir.to_str().unwrap());
         assert!(song_dir.is_dir());
         let exist_map_ids: Vec<u32> = std::fs::read_dir(song_dir)
             .unwrap()
@@ -97,7 +97,10 @@ fn remove_duplicates(map_id_lst: Vec<u32>) -> Vec<u32>{
                     .unwrap()
                     .parse();
                 match exist_map_id {
-                    Ok(id) => Some(id),
+                    Ok(id) => {
+                        // println!("Found duplicate map {}. Removing...", id);
+                        Some(id)
+                    },
                     Err(_) => None
                 }
             })

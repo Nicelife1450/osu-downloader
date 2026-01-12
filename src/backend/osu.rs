@@ -2,12 +2,13 @@ use rosu_v2::{Osu, error::OsuError, prelude::GameMode};
 
 pub struct SearchConfig {
     game_mode: GameMode,
-    mapper: Option<String>
+    mapper: Option<String>,
+    keys: Option<u8>
 }
 
 impl SearchConfig {
     pub fn new() -> Self {
-        Self { game_mode: GameMode::Mania, mapper: None }
+        Self { game_mode: GameMode::Mania, mapper: None, keys: None}
     }
 
     #[inline]
@@ -19,6 +20,12 @@ impl SearchConfig {
     #[inline]
     pub fn mapper(mut self, mapper: String) -> Self {
         self.mapper = Some(mapper);
+        self 
+    }
+
+    #[inline]
+    pub const fn keys(mut self, keys: u8) -> Self {
+        self.keys = Some(keys);
         self 
     }
 }
@@ -35,13 +42,17 @@ pub async fn login() -> Result<Osu, OsuError> {
 pub async fn search_maps(osu: &Osu, config: SearchConfig) -> Vec<u32>{
     let game_mode = config.game_mode;
     let mapper = config.mapper.unwrap();
+    let mut query = String::from(format!("mapper={} ", mapper));
+    if let Some(keys) = config.keys {
+        query.push_str(format!("key={} ", keys).as_str());
+    }
 
      //Search Maps
     let mut found_maps = osu.beatmapset_search()
         .nsfw(false)
         .status(None)
         .mode(game_mode)
-        .query(format!("mapper={}", mapper))
+        .query(query)
         .await
         .unwrap();
     let mut all_mapset_ids : Vec<u32>= Vec::new();
