@@ -39,19 +39,24 @@ pub fn find_game_dir() -> Option<PathBuf> {
         let home = PathBuf::from(home);
         // Wine / osu!lazer 等常见位置
         search_roots.push(home.join(".local/share/osu"));
+        search_roots.push(home.join(".local/share/osu!"));
         search_roots.push(home.join(".local/share/osu-wine"));
         search_roots.push(home.join("AppData/Local/osu")); // Windows 子目录（在 Wine 下亦常见）
+        search_roots.push(home.join("AppData/Local/osu!")); // Windows 子目录（在 Wine 下亦常见）
     }
 
     for key in ["LOCALAPPDATA", "PROGRAMFILES", "PROGRAMFILES(X86)"] {
         if let Ok(dir) = env::var(key) {
-            search_roots.push(PathBuf::from(dir).join("osu"));
+            search_roots.push(PathBuf::from(&dir).join("osu"));
+            search_roots.push(PathBuf::from(&dir).join("osu!"));
         }
     }
 
     for drive in ['C', 'D', 'E', 'F'] {
         search_roots.push(PathBuf::from(format!("{drive}:\\osu")));
+        search_roots.push(PathBuf::from(format!("{drive}:\\osu!")));
         search_roots.push(PathBuf::from(format!("{drive}:\\Games\\osu")));
+        search_roots.push(PathBuf::from(format!("{drive}:\\Games\\osu!")));
     }
 
     for root in search_roots {

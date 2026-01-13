@@ -12,7 +12,7 @@ mod utils;
 
 // const SOURCE: &str = "https://catboy.best/d/{id}";
 const SOURCE: &str = "https://txy1.sayobot.cn/beatmaps/download/mini/{id}?server=auto";
-const DOWNLOAD_DIR: &str = "./songs";
+const DOWNLOAD_DIR: &str = "./Songs";
 
 /// 并发下载多个地图文件
 /// 
@@ -22,7 +22,7 @@ const DOWNLOAD_DIR: &str = "./songs";
 /// # 参数
 /// - `map_id_lst`: 要下载的地图 ID 列表
 /// - `concurrent_limit`: 最大并发数（默认 5）
-pub async fn download_maps(map_id_lst: Vec<u32>) -> Result<(), Box<dyn Error + Send>> {
+pub async fn download_maps(map_id_lst: Vec<u32>) -> Result<String, Box<dyn Error + Send>> {
     fs::create_dir_all(DOWNLOAD_DIR).await
         .map_err(|e| Box::new(e) as Box<dyn Error + Send>)?;
 
@@ -73,11 +73,7 @@ pub async fn download_maps(map_id_lst: Vec<u32>) -> Result<(), Box<dyn Error + S
         }
     }
     
-    if fail_count > 0 {
-        eprintln!("Download completed: {} succeeded, {} failed", success_count, fail_count);
-    }
-    
-    Ok(())
+    Ok(format!("{} succeeded, {} failed.", success_count, fail_count))
 }
 
 fn remove_duplicates(map_id_lst: Vec<u32>) -> Vec<u32>{
@@ -115,6 +111,7 @@ fn remove_duplicates(map_id_lst: Vec<u32>) -> Vec<u32>{
 
         final_id_lst
     } else {
+        println!("Can't find songs directory. Download all found maps.");
         map_id_lst
     }
 }

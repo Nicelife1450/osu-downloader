@@ -1,6 +1,6 @@
 mod backend;
-mod frontend;
+mod gui;
 
 fn main() -> iced::Result {
-    frontend::gui::run()
+    gui::run()
 }

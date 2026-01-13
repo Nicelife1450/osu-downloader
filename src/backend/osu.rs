@@ -3,12 +3,12 @@ use rosu_v2::{Osu, error::OsuError, prelude::GameMode};
 pub struct SearchConfig {
     game_mode: GameMode,
     mapper: Option<String>,
-    keys: Option<u8>
+    custom_query: Option<String>,
 }
 
 impl SearchConfig {
     pub fn new() -> Self {
-        Self { game_mode: GameMode::Mania, mapper: None, keys: None}
+        Self { game_mode: GameMode::Mania, mapper: None, custom_query: None}
     }
 
     #[inline]
@@ -24,8 +24,8 @@ impl SearchConfig {
     }
 
     #[inline]
-    pub const fn keys(mut self, keys: u8) -> Self {
-        self.keys = Some(keys);
+    pub fn custom_query(mut self, custom_query: String) -> Self {
+        self.custom_query = Some(custom_query);
         self 
     }
 }
@@ -42,11 +42,12 @@ pub async fn login() -> Result<Osu, OsuError> {
 pub async fn search_maps(osu: &Osu, config: SearchConfig) -> Vec<u32>{
     let game_mode = config.game_mode;
     let mapper = config.mapper.unwrap();
-    let mut query = String::from(format!("mapper={} ", mapper));
-    if let Some(keys) = config.keys {
-        query.push_str(format!("key={} ", keys).as_str());
+    let mut query = String::from(format!("{} ", mapper));
+    if let Some(custom_query) = config.custom_query {
+        query.push_str(custom_query.as_str());
     }
 
+    println!("Searching beatmaps use query: {}", &query);
      //Search Maps
     let mut found_maps = osu.beatmapset_search()
         .nsfw(false)
