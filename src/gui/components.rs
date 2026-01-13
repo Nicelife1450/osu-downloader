@@ -12,7 +12,7 @@ pub fn mapper_input<'a>(value: &'a str) -> Element<'a, Message> {
 }
 
 pub fn custom_query_input<'a>(value: &'a str) -> Element<'a, Message> {
-    text_input("Enter custom query (e.g. key=7 star>4.5)", value)
+    text_input("Enter custom query (e.g. key=7 status=r)", value)
         .on_input(Message::CustomQueryChanged)
         .padding(10)
         .width(Length::Fill)
