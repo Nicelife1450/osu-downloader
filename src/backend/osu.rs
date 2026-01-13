@@ -36,6 +36,7 @@ impl SearchConfig {
 
 pub async fn login() -> Result<Osu, OsuError> {
     // Login with secret id and password
+    // Using token of my own account for easy config, make good use of it please !
     println!("Signing in...");
     let client_id: u64 = 47208;
     let client_secret = String::from("D400j2fmT5xWN55uuj51r4EGgTnweSZLItPJhvgu");
