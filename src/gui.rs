@@ -129,8 +129,10 @@ impl Application for App {
                     return Command::none();
                 }
 
-                if self.mapper_input.trim().is_empty() {
-                    self.status_message = String::from("Error: Please enter a mapper name");
+                if self.mapper_input.trim().is_empty() && self.custom_query.trim().is_empty() {
+                    self.status_message = String::from(
+                        "Error: Please specity at least one condition, mapper or custom query.",
+                    );
                     return Command::none();
                 }
 
@@ -252,7 +254,7 @@ async fn download_task(
 pub fn run() -> iced::Result {
     App::run(Settings {
         window: window::Settings {
-            size: Size::new(480.0, 480.0),
+            size: Size::new(480.0, 520.0),
             min_size: Some(Size::new(480.0, 480.0)),
             ..Default::default()
         },
