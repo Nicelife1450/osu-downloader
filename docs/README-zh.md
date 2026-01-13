@@ -1,8 +1,10 @@
-# 🎵 Osu! Beatmap Downloader
+# Osu! Beatmap Downloader
 
 一款开箱即用的桌面应用，用于搜索并下载 osu! 谱面合集。提供简洁的图形界面，可按谱师或自定义关键字筛选，选择游戏模式，并以并发方式下载多个谱面，带有进度指示。
 
-![界面示例](./image.png)
+<div align="center">
+  <img src="./image.png" alt="alt text" width="400">
+</div>
 
 ## ✨ 功能
 - 按谱师名称和/或自定义关键字搜索

@@ -2,7 +2,9 @@
 
 A small desktop app to search and download osu! beatmap sets out-of-the-box.
 
-![alt text](./docs/image.png)
+<div align="center">
+  <img src="./docs/image.png" alt="alt text" width="400">
+</div>
 
 中文文档：请查看 [docs/README-zh.md](./docs/README-zh.md)
 
